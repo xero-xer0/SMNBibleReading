@@ -428,10 +428,12 @@ h1 {
 }
 
 @media (max-width: 600px) {
-  /* Fix for input overflow on small screens */
-  .form-group input,
-  .form-group select {
+
+  /* Fix for input overflow on small screens - Date input ONLY */
+  #bulk-date {
     max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   h1 {
