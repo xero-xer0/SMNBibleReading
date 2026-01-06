@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>성경 읽기표</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>서머나 청년 📖 성경 읽기표</h1>
+            <div class="header-controls">
+                <button type="button" id="join-btn" class="btn">사용자 추가</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Leaderboard Section -->
+            <section class="card leaderboard">
+                <ul id="leaderboard-list" class="leaderboard-list">
+                    <!-- Javascript will populate this -->
+                    <li style="text-align:center; padding: 20px;">로딩 중...</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- User Detail Modal (Reading Check) -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-controls">
+                    <!-- Row 1: Name & Rename -->
+                    <div class="header-row-top">
+                        <h2 id="modal-username" class="modal-title">사용자 이름</h2>
+                        <div class="header-actions-right">
+                            <button id="rename-btn" class="text-btn" style="display:none;">이름 변경</button>
+                            <button id="delete-user-btn" class="text-btn red"
+                                style="display:none; margin-left:8px;">삭제</button>
+                        </div>
+                    </div>
+                    <!-- Row 2: Actions -->
+                    <div class="header-row-bottom">
+                        <button id="edit-mode-btn" class="text-btn">🔒 인증/수정</button>
+                        <button id="open-bulk-btn" class="text-btn" style="display:none;">기록하기</button>
+                        <button id="range-select-btn" class="text-btn" style="display:none;">범위 선택</button>
+                        <button id="view-history-btn" class="text-btn" style="display:none;">기록 내역</button>
+                    </div>
+                </div>
+                <button class="close-btn" style="margin-left: 10px;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-status-msg"
+                    style="margin-bottom: 20px; padding: 10px; background: #fff3cd; border-radius: 6px; display: none;">
+                    ⚠️ 본인 확인이 되지 않아 읽기만 가능합니다. <a href="#" id="verify-link">인증하기</a>
+                </div>
+                <div id="bible-content">
+                    <!-- Books and chapters go here -->
+                </div>
+                <div id="range-action-bar" class="range-action-bar">
+                    <span id="range-bar-text">선택된 범위: 없음</span>
+                    <div class="range-bar-actions">
+                        <button id="range-bar-modify" class="text-btn white">수정</button>
+                        <button id="range-bar-delete" class="text-btn red">삭제</button>
+                        <button id="range-bar-cancel" class="text-btn white-dim">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Bulk Add Modal -->
+    <div id="bulk-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">한 번에 기록하기</h2>
+                <button class="close-btn" data-target="bulk-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="bulk-form" onsubmit="return false;">
+                    <div class="form-group">
+                        <label>날짜</label>
+                        <input type="date" id="bulk-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>성경 책</label>
+                        <select id="bulk-book" required></select>
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
+                        <div style="flex:1">
+                            <label>시작 장</label>
+                            <select id="bulk-start" required></select>
+                        </div>
+                        <span>~</span>
+                        <div style="flex:1">
+                            <label>끝 장</label>
+                            <select id="bulk-end" required></select>
+                        </div>
+                    </div>
+                    <button type="button" id="bulk-submit-btn" class="btn" style="width: 100%;">저장하기</button>
+                    <p id="bulk-summary"
+                        style="text-align: center; margin-top: 10px; color: #7f8c8d; font-size: 0.9rem;"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Modal (3-Stage) -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header">
+                <h2 class="modal-title">계정 삭제</h2>
+                <button class="close-btn" data-target="delete-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Step 1: Warning -->
+                <div id="delete-step-1">
+                    <p style="color: #c0392b; font-weight: bold; margin-bottom: 20px;">
+                        경고: 계정이 영구적으로 삭제됩니다.<br>
+                        이 작업은 되돌릴 수 없습니다.
+                    </p>
+                    <button id="delete-confirm-1-btn" class="text-btn red"
+                        style="background:#fcebe6; border-color:#e74c3c; width:100%;">
+                        확인 (삭제 진행)
+                    </button>
+                </div>
+
+                <!-- Step 2: Password -->
+                <div id="delete-step-2" style="display:none;">
+                    <p style="margin-bottom: 15px;">본인 확인을 위해<br>비밀번호 4자리를 입력해주세요.</p>
+                    <input type="password" id="delete-password-input" maxlength="4" placeholder="비밀번호"
+                        style="width:100%; padding:10px; margin-bottom:10px; text-align:center; font-size:1.2rem;">
+                    <button id="delete-verify-btn" class="text-btn" style="width:100%; background:#eee;">확인</button>
+                </div>
+
+                <!-- Step 3: Final -->
+                <div id="delete-step-3" style="display:none;">
+                    <p style="color: #c0392b; font-weight: 700; margin-bottom: 20px; font-size: 1.1rem;">
+                        마지막 경고!<br>정말로 삭제하시겠습니까?
+                    </p>
+                    <button id="delete-final-btn" class="text-btn red"
+                        style="background:#c0392b; color:white; width:100%; padding:15px;">
+                        즉시 삭제
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join / Login Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">참여하기 / 인증하기</h2>
+                <button class="close-btn" data-target="auth-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="auth-form" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="nickname">이름 (닉네임)</label>
+                        <input type="text" id="nickname" required placeholder="본명 또는 별명">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">비밀번호 (4자리 이상)</label>
+                        <input type="password" id="password" required placeholder="비밀번호">
+                    </div>
+                    <div class="form-group" id="password-confirm-group" style="display:none;">
+                        <label for="password-confirm">비밀번호 확인</label>
+                        <input type="password" id="password-confirm" placeholder="한번 더 입력">
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%;">시작하기</button>
+                    <p style="font-size: 0.8rem; color: #7f8c8d; margin-top: 10px; text-align: center;">
+                        이미 등록된 이름이면 로그인하고, 없으면 새로 등록합니다.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Picker Modal -->
+    <div id="date-modal" class="modal">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-header">
+                <h2 class="modal-title">언제 읽으셨나요?</h2>
+            </div>
+            <div class="modal-body date-picker-container">
+                <p id="target-chapter-label" style="margin-bottom: 15px; font-weight: bold;"></p>
+                <input type="date" id="reading-date" required>
+                <div class="date-picker-actions">
+                    <button id="cancel-date-btn" class="btn-secondary">취소</button>
+                    <button id="confirm-date-btn" class="btn">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History List Modal -->
+    <div id="history-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📖 읽기 기록 내역</h2>
+                <button class="close-btn" data-target="history-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="history-list-container">
+                    <!-- Log items will go here -->
+                    <ul id="history-log-list" class="history-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Log Modal -->
+    <div id="edit-log-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 class="modal-title">기록 수정하기</h2>
+                <button class="close-btn" data-target="edit-log-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-log-form" onsubmit="return false;">
+                    <input type="hidden" id="edit-log-id">
+                    <div class="form-group">
+                        <label>날짜</label>
+                        <input type="date" id="edit-log-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>성경 책</label>
+                        <input type="text" id="edit-log-bookname" disabled style="background:#eee;">
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
+                        <div style="flex:1">
+                            <label>시작 장</label>
+                            <input type="number" id="edit-log-start" required>
+                        </div>
+                        <span>~</span>
+                        <div style="flex:1">
+                            <label>끝 장</label>
+                            <input type="number" id="edit-log-end" required>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; margin-top:20px;">
+                        <button type="button" id="delete-log-btn" class="btn"
+                            style="background:#e74c3c; flex:1;">삭제하기</button>
+                        <button type="submit" id="save-log-btn" class="btn" style="flex:2;">수정 저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="bible_data.js"></script>
+    <script src="script.js?v=3"></script>
+</body>
+
+</html>

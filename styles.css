@@ -1,0 +1,652 @@
+:root {
+  --primary-color: #4a90e2;
+  --success-color: #2ecc71;
+  --bg-color: #f5f7fa;
+  --card-bg: #ffffff;
+  --text-color: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --border-color: #e1e8ed;
+  --gold: #f1c40f;
+  --silver: #95a5a6;
+  --bronze: #cd7f32;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.header-controls {
+  margin-top: 20px;
+}
+
+.btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Leaderboard */
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.user-item:last-child {
+  border-bottom: none;
+}
+
+.user-item:hover {
+  background-color: #f8f9fa;
+}
+
+.rank {
+  width: 40px;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-right: 16px;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: block;
+}
+
+.bible-version-badge {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.progress-container {
+  margin-top: 8px;
+}
+
+.progress-bar-bg {
+  height: 8px;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--success-color);
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+/* Leaderboard Stats Layout */
+.user-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.last-chapter-info {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.progress-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.last-date-info {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+}
+
+@media (max-width: 600px) {
+  .last-chapter-info {
+    font-size: 0.8rem;
+  }
+
+  .last-date-info {
+    font-size: 0.75rem;
+  }
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Book Grid */
+.book-section {
+  margin-bottom: 24px;
+}
+
+.book-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-color);
+}
+
+.chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  /* Strict 10 columns per row */
+  gap: 5px;
+  /* Tighter gap */
+}
+
+.chapter-btn {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid var(--border-color);
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  /* Changed for date */
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  position: relative;
+  padding: 2px;
+}
+
+.chapter-num {
+  font-weight: bold;
+}
+
+.chapter-date {
+  font-size: 0.6rem;
+  margin-top: 2px;
+  color: #666;
+}
+
+.chapter-btn.read .chapter-date {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* History List */
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-info {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.history-date {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  width: 80px;
+}
+
+.history-delete-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.history-delete-btn:hover {
+  opacity: 1;
+}
+
+.chapter-btn.read {
+  background-color: var(--success-color);
+  color: white;
+  border-color: var(--success-color);
+}
+
+.chapter-btn.disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Tooltip for read date */
+.chapter-btn[title]:hover::after {
+  /* Browser default tooltip is usually sufficient, 
+     but we could add custom CSS tooltip here if needed */
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* Date Picker Modal adjustment */
+.date-picker-container {
+  text-align: center;
+}
+
+.history-item.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.history-item.clickable:hover {
+  background-color: #f8f9fa;
+}
+
+/* Range Selection Styling */
+.select-mode-active {
+  background-color: #ffd700 !important;
+  /* Gold/Yellow for active state */
+  color: #333 !important;
+  border: 1px solid #e0c200 !important;
+}
+
+.chapter-btn.selected-start {
+  background-color: #ff9800;
+  /* Orange for start point */
+  color: white;
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.chapter-btn.in-range {
+  background-color: #fff3e0;
+  /* Light Orange for range */
+  border-color: #ffb74d;
+}
+
+/* Ensure text color is readable */
+.chapter-btn.in-range .chapter-num {
+  color: #ef6c00;
+}
+
+.date-picker-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-secondary {
+  background-color: var(--text-secondary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  /* Mobile Modal: Full width, more vertical space */
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 12px 15px;
+  }
+
+  .header-row-bottom {
+    gap: 8px;
+    /* Tighter gap on mobile */
+  }
+
+  .text-btn {
+    padding: 10px 12px;
+    /* Large touch target */
+    font-size: 0.85rem;
+  }
+
+  /* Chapter Grid: Enforce 10 cols on mobile */
+  .chapter-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 3px;
+  }
+
+  .chapter-btn {
+    min-height: 0;
+    /* Let aspect ratio drive height */
+    aspect-ratio: 1;
+    font-size: 0.75rem;
+    /* Smaller font to fit */
+    padding: 2px;
+  }
+
+  .chapter-date {
+    font-size: 0.55rem;
+    /* Tiny date */
+    margin-top: 1px;
+  }
+
+  .range-action-bar {
+    width: 95%;
+    padding: 10px 15px;
+    bottom: 15px;
+    flex-wrap: nowrap;
+    /* Prevent wrapping */
+  }
+
+  .range-action-bar .text-btn {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    /* CRITICAL FIX: Prevent "수\n정" */
+  }
+
+  #range-bar-text {
+    font-size: 0.85rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    /* Allow text to take space but shrink if needed */
+    margin-right: 5px;
+  }
+}
+
+/* =========================================
+   New Design: Text Buttons & Action Bar
+   ========================================= */
+
+/* Soft Rectangular Button Style (Neutral) */
+.text-btn {
+  background-color: #f7f9fc;
+  border: 1px solid #e1e8ed;
+  color: #333;
+  /* Neutral text */
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 10px;
+  /* Matching curvature */
+  transition: all 0.2s;
+}
+
+.text-btn:hover {
+  background-color: #e2e6ea;
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* Remove colored text overrides, keep neutral but allow red specific override */
+.text-btn.orange {
+  color: #333;
+}
+
+.text-btn.red {
+  color: #c0392b;
+  border-color: #e74c3c;
+}
+
+.text-btn.white {
+  color: #333;
+  background: #fff;
+}
+
+.text-btn.white-dim {
+  color: #666;
+  background: #eee;
+}
+
+
+/* Modal Header Layout */
+.modal-header {
+  align-items: flex-start;
+  padding: 15px 20px;
+}
+
+.modal-header-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Increased gap for separation */
+}
+
+.header-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* Push Name left, Rename right */
+  width: 100%;
+}
+
+.header-actions-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-row-bottom {
+  display: grid;
+  /* Grid for equal alignment */
+  grid-template-columns: repeat(3, 1fr);
+  /* 3 Equal Columns */
+  gap: 10px;
+  width: 100%;
+}
+
+/* Ensure buttons fill the grid cells */
+.header-row-bottom .text-btn {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+}
+
+/* Range Action Bar (Floating) */
+.range-action-bar {
+  position: absolute;
+  /* Relative to modal-content? No, fixed to modal-body bottom */
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background-color: #2c3e50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+  display: none;
+  /* Hidden by default */
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  z-index: 2000;
+  width: 90%;
+  max-width: 400px;
+  justify-content: space-between;
+}
+
+.range-action-bar.active {
+  display: flex;
+  animation: slideUp 0.3s ease-out;
+}
+
+.range-bar-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  /* Don't shrink buttons */
+}
+
+/* Ensure buttons inside have correct color */
+.range-action-bar .text-btn {
+  color: #333;
+  background: #fff;
+  white-space: nowrap;
+  /* Prevent wrapping desktop/mobile */
+}
+
+@keyframes slideUp {
+  from {
+    transform: translate(-50%, 20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
