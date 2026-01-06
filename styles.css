@@ -428,6 +428,12 @@ h1 {
 }
 
 @media (max-width: 600px) {
+  /* Fix for input overflow on small screens */
+  .form-group input,
+  .form-group select {
+    max-width: 100%;
+  }
+
   h1 {
     font-size: 1.8rem;
   }
